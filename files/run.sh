@@ -50,10 +50,6 @@ else
 fi
 
 
-
-
-EnableRemoteCommands
-
 if [ ! -z "$PSKKey" ]; then
     # Check key validity (if it's not valid zabbix_agentd exits abnormally without a decent error output)
     if [[ ! "$PSKKey" =~ ^[a-f0-9]+$ ]]; then
