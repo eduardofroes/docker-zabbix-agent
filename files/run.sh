@@ -1,24 +1,58 @@
 #!/bin/sh
 set -e
 
-if [ -z "$ZABBIX_SERVER" ]; then
-    echo "ZABBIX_SERVER environment variable is empty"
+if [ -z "$ZBX_SERVER_HOST" ]; then
+    echo "ZBX_SERVER_HOST environment variable is empty"
     exit 1
 fi
 
-if [ -z "$HOST" ]; then
+if [ -z "$ZBX_HOSTNAME" ]; then
     MACHINEID=$(cat /etc/machine-id)
     HOST="$METADATA-$MACHINEID"
     echo "HOST environment variable is empty, using generated host name $HOST"
 fi
 
-sed -i "s/^Server\=127.0.0.1/Server\=$ZABBIX_SERVER/" /etc/zabbix/zabbix_agentd.conf
-sed -i "s/^ServerActive\=127.0.0.1/ServerActive\=$ZABBIX_SERVER/" /etc/zabbix/zabbix_agentd.conf
+sed -i "s/^Server\=127.0.0.1/Server\=$ZBX_SERVER_HOST/" /etc/zabbix/zabbix_agentd.conf
+sed -i "s/^ServerActive\=127.0.0.1/ServerActive\=$ZBX_ACTIVESERVERS/" /etc/zabbix/zabbix_agentd.conf
 # Log to stdout so that docker can capture it
 sed -i "s/^LogFile\=.*/LogFile=\/proc\/self\/fd\/1/" /etc/zabbix/zabbix_agentd.conf
 echo "Hostname=$HOST" >> /etc/zabbix/zabbix_agentd.conf
 echo "HostMetadata=$METADATA" >> /etc/zabbix/zabbix_agentd.conf
-echo "AllowRoot=1" >> /etc/zabbix/zabbix_agentd.conf
+
+if [ -z "$ZBX_SERVER_HOST" ]; then
+    echo "AllowRoot=1" >> /etc/zabbix/zabbix_agentd.conf
+else
+    echo "AllowRoot=$ZBX_ACTIVE_ALLOW" >> /etc/zabbix/zabbix_agentd.conf
+fi
+
+if [ -z "$ZBX_STARTAGENTS" ]; then
+    echo "StartAgents=3" >> /etc/zabbix/zabbix_agentd.conf
+else
+    echo "StartAgents=$ZBX_STARTAGENTS" >> /etc/zabbix/zabbix_agentd.conf
+fi
+
+if [ -z "$ZBX_DEBUGLEVEL" ]; then
+    echo "DebugLevel=4" >> /etc/zabbix/zabbix_agentd.conf
+else
+    echo "DebugLevel=$ZBX_DEBUGLEVEL" >> /etc/zabbix/zabbix_agentd.conf
+fi
+
+if [ -z "$ZBX_ENABLEREMOTECOMMANDS" ]; then
+    echo "EnableRemoteCommands=0" >> /etc/zabbix/zabbix_agentd.conf
+else
+    echo "EnableRemoteCommands=$ZBX_ENABLEREMOTECOMMANDS" >> /etc/zabbix/zabbix_agentd.conf
+fi
+
+if [ -z "$ZBX_LOGREMOTECOMMANDS" ]; then
+    echo "LogRemoteCommands=0" >> /etc/zabbix/zabbix_agentd.conf
+else
+    echo "LogRemoteCommands=$ZBX_LOGREMOTECOMMANDS" >> /etc/zabbix/zabbix_agentd.conf
+fi
+
+
+
+
+EnableRemoteCommands
 
 if [ ! -z "$PSKKey" ]; then
     # Check key validity (if it's not valid zabbix_agentd exits abnormally without a decent error output)
