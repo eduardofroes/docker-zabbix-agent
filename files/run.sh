@@ -2,52 +2,80 @@
 set -e
 
 if [ -z "$ZBX_SERVER_HOST" ]; then
-    echo "ZBX_SERVER_HOST environment variable is empty"
-    exit 1
+    SERVERHOST="0.0.0.0\/0"
+    echo "Server Host environment variable is empty, using generated server host "
+else
+    echo "Server Host=$ZBX_SERVER_HOST"
+    SERVERHOST="${ZBX_SERVER_HOST////\\/}"
 fi
 
 if [ -z "$ZBX_HOSTNAME" ]; then
     MACHINEID=$(cat /etc/machine-id)
     HOST="$METADATA-$MACHINEID"
-    echo "HOST environment variable is empty, using generated host name $HOST"
+    echo "Agent Host name environment variable is empty, using generated value $HOST"
+else
+    HOST="$ZBX_HOSTNAME"
+    echo "Agent Host Name=$ZBX_HOSTNAME"
 fi
 
-sed -i "s/^Server\=127.0.0.1/Server\=$ZBX_SERVER_HOST/" /etc/zabbix/zabbix_agentd.conf
-sed -i "s/^ServerActive\=127.0.0.1/ServerActive\=$ZBX_ACTIVESERVERS/" /etc/zabbix/zabbix_agentd.conf
-# Log to stdout so that docker can capture it
-sed -i "s/^LogFile\=.*/LogFile=\/proc\/self\/fd\/1/" /etc/zabbix/zabbix_agentd.conf
-echo "Hostname=$HOST" >> /etc/zabbix/zabbix_agentd.conf
-echo "HostMetadata=$METADATA" >> /etc/zabbix/zabbix_agentd.conf
-
-if [ -z "$ZBX_SERVER_HOST" ]; then
-    echo "AllowRoot=1" >> /etc/zabbix/zabbix_agentd.conf
+if [ -z "$ZBX_ACTIVESERVERS" ]; then
+    ACTIVESERVERS=$ZBX_SERVER_HOST+":10051"
+    echo "Active Servers environment variable is empty, using generated value $ACTIVESERVERS"
 else
-    echo "AllowRoot=$ZBX_ACTIVE_ALLOW" >> /etc/zabbix/zabbix_agentd.conf
+    ACTIVESERVERS="$ZBX_ACTIVESERVERS"
+    echo "Active Servers=$ZBX_ACTIVESERVERS"
+fi
+
+if [ -z "$ZBX_ACTIVE_ALLOW" ]; then
+    ALLOWROOT="true"
+    echo "Allow Root environment variable is empty, using generated value $ALLOWROOT"
+else
+    ALLOWROOT=$ZBX_ACTIVE_ALLOW
+    echo "Allow Root=$ACTIVEALLOW"
 fi
 
 if [ -z "$ZBX_STARTAGENTS" ]; then
-    echo "StartAgents=3" >> /etc/zabbix/zabbix_agentd.conf
+    STARTAGENTS="3"
+    echo "Allow Root environment variable is empty, using generated value $STARTAGENTS"
 else
-    echo "StartAgents=$ZBX_STARTAGENTS" >> /etc/zabbix/zabbix_agentd.conf
+    STARTAGENTS="$ZBX_STARTAGENTS"
+    echo "Start Agents=$STARTAGENTS"
 fi
 
 if [ -z "$ZBX_DEBUGLEVEL" ]; then
-    echo "DebugLevel=4" >> /etc/zabbix/zabbix_agentd.conf
+    DEBUGLEVEL="4"
+    echo "Debug Level environment variable is empty, using generated value $DEBUGLEVEL"
 else
-    echo "DebugLevel=$ZBX_DEBUGLEVEL" >> /etc/zabbix/zabbix_agentd.conf
+    DEBUGLEVEL="$ZBX_DEBUGLEVEL"
+    echo "Debug Level=$DEBUGLEVEL"
 fi
 
 if [ -z "$ZBX_ENABLEREMOTECOMMANDS" ]; then
-    echo "EnableRemoteCommands=0" >> /etc/zabbix/zabbix_agentd.conf
+    ENABLEREMOTECOMMANDS="1"
+    echo "Enable Remote Commands environment variable is empty, using generated value $ENABLEREMOTECOMMANDS"
 else
-    echo "EnableRemoteCommands=$ZBX_ENABLEREMOTECOMMANDS" >> /etc/zabbix/zabbix_agentd.conf
+    ENABLEREMOTECOMMANDS="$ZBX_ENABLEREMOTECOMMANDS"
+    echo "Enable Remote Commands=$ENABLEREMOTECOMMANDS"
 fi
 
 if [ -z "$ZBX_LOGREMOTECOMMANDS" ]; then
-    echo "LogRemoteCommands=0" >> /etc/zabbix/zabbix_agentd.conf
+    LOGREMOTECOMMANDS="1"
+    echo "Log Remote Commands environment variable is empty, using generated value $ZBX_LOGREMOTECOMMANDS"
 else
-    echo "LogRemoteCommands=$ZBX_LOGREMOTECOMMANDS" >> /etc/zabbix/zabbix_agentd.conf
+    LOGREMOTECOMMANDS="$ZBX_LOGREMOTECOMMANDS"
+    echo "Log Remote Commands=$LOGREMOTECOMMANDS"
 fi
+
+echo "StartAgents=$STARTAGENTS" >> /etc/zabbix/zabbix_agentd.conf
+echo "DebugLevel=$DEBUGLEVEL" >> /etc/zabbix/zabbix_agentd.conf
+echo "EnableRemoteCommands=$ENABLEREMOTECOMMANDS" >> /etc/zabbix/zabbix_agentd.conf
+echo "LogRemoteCommands=$LOGREMOTECOMMANDS" >> /etc/zabbix/zabbix_agentd.conf
+sed -i "s/^Server\=127.0.0.1/Server\=0.0.0.0\/0/" /etc/zabbix/zabbix_agentd.conf
+sed -i "s/^ServerActive\=127.0.0.1/ServerActive\=$ACTIVESERVERS/" /etc/zabbix/zabbix_agentd.conf
+sed -i "s/^LogFile\=.*/LogFile=\/proc\/self\/fd\/1/" /etc/zabbix/zabbix_agentd.conf
+echo "Hostname=$HOST" >> /etc/zabbix/zabbix_agentd.conf
+echo "HostMetadata=$METADATA" >> /etc/zabbix/zabbix_agentd.conf
+echo "AllowRoot=$ALLOWROOT" >> /etc/zabbix/zabbix_agentd.conf
 
 
 if [ ! -z "$PSKKey" ]; then
