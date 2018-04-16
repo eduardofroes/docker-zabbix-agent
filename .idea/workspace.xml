@@ -14,8 +14,8 @@
       <file leaf-file-name="run.sh" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/files/run.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="66" column="2" lean-forward="true" selection-start-line="66" selection-start-column="2" selection-end-line="66" selection-end-column="2" />
+            <state relative-caret-position="663">
+              <caret line="87" column="92" lean-forward="true" selection-start-line="87" selection-start-column="92" selection-end-line="87" selection-end-column="92" />
               <folding />
             </state>
           </provider>
@@ -94,8 +94,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-1" />
-    <option name="y" value="-14" />
+    <option name="x" value="1919" />
+    <option name="y" value="1066" />
     <option name="width" value="1922" />
     <option name="height" value="1095" />
   </component>
@@ -279,7 +279,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="-14" width="1922" height="1095" extended-state="6" />
+    <frame x="1919" y="1066" width="1922" height="1095" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -383,8 +383,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/files/run.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="66" column="2" lean-forward="true" selection-start-line="66" selection-start-column="2" selection-end-line="66" selection-end-column="2" />
+        <state relative-caret-position="663">
+          <caret line="87" column="92" lean-forward="true" selection-start-line="87" selection-start-column="92" selection-end-line="87" selection-end-column="92" />
           <folding />
         </state>
       </provider>
